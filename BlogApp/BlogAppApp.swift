@@ -172,6 +172,10 @@ class BlogAPIClient {
         try await request(endpoint: "/api/comments/post/\(postId)")
     }
     
+    func getPendingComments() async throws -> CommentsResponse {
+        try await request(endpoint: "/api/comments/pending", requiresAuth: true)
+    }
+    
     func moderateComment(id: Int64, approve: Bool) async throws -> BlogComment {
         let body = try JSONEncoder().encode(["approve": approve])
         return try await request(endpoint: "/api/comments/\(id)/moderate", method: "PUT", body: body, requiresAuth: true)

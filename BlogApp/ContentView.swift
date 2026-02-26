@@ -416,8 +416,6 @@ struct CreatePostView: View {
 
 struct ModerateCommentsView: View {
     @EnvironmentObject var appState: AppState
-    @State private var posts: [BlogPost] = []
-    @State private var selectedPost: BlogPost?
     @State private var comments: [BlogComment] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -425,56 +423,43 @@ struct ModerateCommentsView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if isLoading && posts.isEmpty {
-                    ProgressView("Loading...")
+                if isLoading && comments.isEmpty {
+                    ProgressView("Loading pending comments...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if posts.isEmpty {
+                } else if let error = errorMessage, comments.isEmpty {
                     ContentUnavailableView {
-                        Label("No Posts", systemImage: "text.bubble")
+                        Label("Error", systemImage: "exclamationmark.triangle")
                     } description: {
-                        Text("No posts available to moderate")
+                        Text(error)
+                    } actions: {
+                        Button("Retry") {
+                            Task { await loadPendingComments() }
+                        }
+                    }
+                } else if comments.isEmpty {
+                    ContentUnavailableView {
+                        Label("No Pending Comments", systemImage: "checkmark.shield")
+                    } description: {
+                        Text("All comments have been moderated")
+                    } actions: {
+                        Button("Refresh") {
+                            Task { await loadPendingComments() }
+                        }
                     }
                 } else {
                     List {
-                        Section("Select Post") {
-                            ForEach(posts) { post in
-                                Button {
-                                    selectedPost = post
-                                    Task { await loadComments(for: post) }
-                                } label: {
-                                    HStack {
-                                        Text(post.content)
-                                            .lineLimit(2)
-                                            .foregroundColor(.primary)
-                                        
-                                        Spacer()
-                                        
-                                        if selectedPost?.id == post.id {
-                                            Image(systemName: "checkmark")
-                                                .foregroundColor(.cyan)
-                                        }
-                                    }
-                                }
+                        Section("Pending Comments (\(comments.count))") {
+                            ForEach(comments) { comment in
+                                CommentRowView(
+                                    comment: comment,
+                                    onApprove: { await approveComment(comment) },
+                                    onDelete: { await deleteComment(comment) }
+                                )
                             }
                         }
-                        
-                        if selectedPost != nil {
-                            Section("Comments") {
-                                if comments.isEmpty {
-                                    Text("No comments for this post")
-                                        .foregroundColor(.secondary)
-                                        .italic()
-                                } else {
-                                    ForEach(comments) { comment in
-                                        CommentRowView(
-                                            comment: comment,
-                                            onApprove: { await approveComment(comment) },
-                                            onDelete: { await deleteComment(comment) }
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                    }
+                    .refreshable {
+                        await loadPendingComments()
                     }
                 }
             }
@@ -482,7 +467,7 @@ struct ModerateCommentsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        Task { await loadPosts() }
+                        Task { await loadPendingComments() }
                     } label: {
                         Image(systemName: "arrow.clockwise")
                     }
@@ -490,7 +475,7 @@ struct ModerateCommentsView: View {
                 }
             }
             .task {
-                await loadPosts()
+                await loadPendingComments()
             }
             .alert("Error", isPresented: .init(
                 get: { errorMessage != nil },
@@ -503,12 +488,13 @@ struct ModerateCommentsView: View {
         }
     }
     
-    private func loadPosts() async {
+    private func loadPendingComments() async {
         isLoading = true
+        errorMessage = nil
         
         do {
-            let response = try await BlogAPIClient.shared.getPosts()
-            posts = response.posts
+            let response = try await BlogAPIClient.shared.getPendingComments()
+            comments = response.comments
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -516,21 +502,10 @@ struct ModerateCommentsView: View {
         isLoading = false
     }
     
-    private func loadComments(for post: BlogPost) async {
-        do {
-            let response = try await BlogAPIClient.shared.getComments(postId: post.id)
-            comments = response.comments
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
     private func approveComment(_ comment: BlogComment) async {
         do {
-            let updated = try await BlogAPIClient.shared.moderateComment(id: comment.id, approve: true)
-            if let index = comments.firstIndex(where: { $0.id == comment.id }) {
-                comments[index] = updated
-            }
+            _ = try await BlogAPIClient.shared.moderateComment(id: comment.id, approve: true)
+            comments.removeAll { $0.id == comment.id }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -563,15 +538,9 @@ struct CommentRowView: View {
                 
                 Spacer()
                 
-                if comment.approved {
-                    Label("Approved", systemImage: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                } else {
-                    Label("Pending", systemImage: "clock")
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                }
+                Text("Post #\(comment.postId)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
             }
             
             Text(comment.content)
@@ -584,21 +553,19 @@ struct CommentRowView: View {
                 
                 Spacer()
                 
-                if !comment.approved {
-                    Button {
-                        Task {
-                            isProcessing = true
-                            await onApprove()
-                            isProcessing = false
-                        }
-                    } label: {
-                        Label("Approve", systemImage: "checkmark")
-                            .font(.caption)
+                Button {
+                    Task {
+                        isProcessing = true
+                        await onApprove()
+                        isProcessing = false
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .disabled(isProcessing)
+                } label: {
+                    Label("Approve", systemImage: "checkmark")
+                        .font(.caption)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .disabled(isProcessing)
                 
                 Button(role: .destructive) {
                     Task {
