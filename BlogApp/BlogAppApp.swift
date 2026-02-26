@@ -26,9 +26,16 @@ class AppState: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
+    @Published var isDarkMode: Bool {
+        didSet {
+            UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
+        }
+    }
+    
     private let keychainService = KeychainService()
     
     init() {
+        self.isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         loadConfiguration()
     }
     

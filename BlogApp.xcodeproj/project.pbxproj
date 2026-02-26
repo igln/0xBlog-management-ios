@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		001 /* BlogAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100; };
-		002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101; };
-		003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 102; };
+		001 /* BlogAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100 /* BlogAppApp.swift */; };
+		002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101 /* ContentView.swift */; };
+		003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 102 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,7 +93,7 @@
 /* Begin PBXNativeTarget section */
 		500 /* BlogApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 600;
+			buildConfigurationList = 600 /* Build configuration list for PBXNativeTarget "BlogApp" */;
 			buildPhases = (
 				510 /* Sources */,
 				300 /* Frameworks */,
@@ -125,7 +125,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 710;
+			buildConfigurationList = 710 /* Build configuration list for PBXProject "BlogApp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -135,8 +135,8 @@
 			);
 			mainGroup = 400;
 			packageReferences = (
-				800 /* grpc-swift */,
-				801 /* swift-protobuf */,
+				800 /* XCRemoteSwiftPackageReference "grpc-swift" */,
+				801 /* XCRemoteSwiftPackageReference "swift-protobuf" */,
 			);
 			productRefGroup = 420 /* Products */;
 			projectDirPath = "";
@@ -177,12 +177,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5JM7DX35S8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BlogApp/Info.plist;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -191,7 +191,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.blog.BlogApp;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.golchin.BlogApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -205,12 +205,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5JM7DX35S8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BlogApp/Info.plist;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -219,7 +219,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.blog.BlogApp;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.golchin.BlogApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -370,7 +370,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		800 /* grpc-swift */ = {
+		800 /* XCRemoteSwiftPackageReference "grpc-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/grpc/grpc-swift.git";
 			requirement = {
@@ -378,7 +378,7 @@
 				minimumVersion = 1.21.0;
 			};
 		};
-		801 /* swift-protobuf */ = {
+		801 /* XCRemoteSwiftPackageReference "swift-protobuf" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-protobuf.git";
 			requirement = {
@@ -387,7 +387,6 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
-
 	};
 	rootObject = 700 /* Project object */;
 }

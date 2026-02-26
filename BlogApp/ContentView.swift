@@ -11,6 +11,26 @@ struct ContentView: View {
                 SettingsView(isInitialSetup: true)
             }
         }
+        .preferredColorScheme(appState.isDarkMode ? .dark : .light)
+    }
+}
+
+// MARK: - Logo View
+
+struct LogoView: View {
+    var size: CGFloat = 60
+    var cornerRadius: CGFloat = 12
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(Color.black)
+            
+            Text("0x.")
+                .font(.system(size: size * 0.45, weight: .bold, design: .monospaced))
+                .foregroundColor(.white)
+        }
+        .frame(width: size, height: size)
     }
 }
 
@@ -59,13 +79,17 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("0xBlog")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Text("Admin Console")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                    HStack(spacing: 16) {
+                        LogoView(size: 60, cornerRadius: 12)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("0xBlog")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            Text("Admin Console")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     .padding(.vertical, 8)
                 }
@@ -129,6 +153,12 @@ struct SettingsView: View {
                                 Spacer()
                             }
                         }
+                    }
+                }
+                
+                Section("Appearance") {
+                    Toggle(isOn: $appState.isDarkMode) {
+                        Label("Dark Mode", systemImage: appState.isDarkMode ? "moon.fill" : "sun.max.fill")
                     }
                 }
                 
