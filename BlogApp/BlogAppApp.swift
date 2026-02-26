@@ -17,7 +17,8 @@ struct BlogAppApp: App {
 class AppState: ObservableObject {
     @Published var isConfigured: Bool = false
     @Published var serverHost: String = ""
-    @Published var serverPort: Int = 8081
+    @Published var serverPort: Int = 443
+    @Published var useHTTPS: Bool = true
     @Published var apiKey: String = ""
     
     @Published var posts: [BlogPost] = []
@@ -42,7 +43,8 @@ class AppState: ObservableObject {
     func loadConfiguration() {
         serverHost = UserDefaults.standard.string(forKey: "serverHost") ?? ""
         serverPort = UserDefaults.standard.integer(forKey: "serverPort")
-        if serverPort == 0 { serverPort = 8081 }
+        if serverPort == 0 { serverPort = 443 }
+        useHTTPS = UserDefaults.standard.object(forKey: "useHTTPS") as? Bool ?? true
         
         if let key = keychainService.getApiKey() {
             apiKey = key
@@ -51,31 +53,35 @@ class AppState: ObservableObject {
         isConfigured = !serverHost.isEmpty && !apiKey.isEmpty
         
         if isConfigured {
-            BlogAPIClient.shared.configure(host: serverHost, port: serverPort, apiKey: apiKey)
+            BlogAPIClient.shared.configure(host: serverHost, port: serverPort, apiKey: apiKey, useHTTPS: useHTTPS)
         }
     }
     
-    func saveConfiguration(host: String, port: Int, apiKey: String) {
+    func saveConfiguration(host: String, port: Int, apiKey: String, useHTTPS: Bool = true) {
         self.serverHost = host
         self.serverPort = port
+        self.useHTTPS = useHTTPS
         self.apiKey = apiKey
         
         UserDefaults.standard.set(host, forKey: "serverHost")
         UserDefaults.standard.set(port, forKey: "serverPort")
+        UserDefaults.standard.set(useHTTPS, forKey: "useHTTPS")
         keychainService.saveApiKey(apiKey)
         
-        BlogAPIClient.shared.configure(host: host, port: port, apiKey: apiKey)
+        BlogAPIClient.shared.configure(host: host, port: port, apiKey: apiKey, useHTTPS: useHTTPS)
         
         isConfigured = !host.isEmpty && !apiKey.isEmpty
     }
     
     func clearConfiguration() {
         serverHost = ""
-        serverPort = 8081
+        serverPort = 443
+        useHTTPS = true
         apiKey = ""
         
         UserDefaults.standard.removeObject(forKey: "serverHost")
         UserDefaults.standard.removeObject(forKey: "serverPort")
+        UserDefaults.standard.removeObject(forKey: "useHTTPS")
         keychainService.deleteApiKey()
         
         isConfigured = false
@@ -111,8 +117,14 @@ class BlogAPIClient {
     
     private init() {}
     
-    func configure(host: String, port: Int, apiKey: String) {
-        self.baseURL = "http://\(host):\(port)"
+    func configure(host: String, port: Int, apiKey: String, useHTTPS: Bool = true) {
+        let scheme = useHTTPS ? "https" : "http"
+        let defaultPort = useHTTPS ? 443 : 80
+        if port == defaultPort {
+            self.baseURL = "\(scheme)://\(host)"
+        } else {
+            self.baseURL = "\(scheme)://\(host):\(port)"
+        }
         self.apiKey = apiKey
     }
     
@@ -159,11 +171,11 @@ class BlogAPIClient {
     }
     
     func getPosts(page: Int = 1, limit: Int = 50) async throws -> PostsResponse {
-        try await request(endpoint: "/api/posts?page=\(page)&limit=\(limit)")
+        try await request(endpoint: "/api/posts?page=\(page)&limit=\(limit)", requiresAuth: true)
     }
     
     func getPost(id: Int64) async throws -> BlogPost {
-        try await request(endpoint: "/api/posts/\(id)")
+        try await request(endpoint: "/api/posts/\(id)", requiresAuth: true)
     }
     
     func createPost(content: String) async throws -> BlogPost {

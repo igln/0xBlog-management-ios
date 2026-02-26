@@ -68,7 +68,8 @@ struct SettingsView: View {
     let isInitialSetup: Bool
     
     @State private var host: String = ""
-    @State private var port: String = "8081"
+    @State private var port: String = "443"
+    @State private var useHTTPS: Bool = true
     @State private var apiKey: String = ""
     @State private var showApiKey: Bool = false
     @State private var isSaving: Bool = false
@@ -102,6 +103,10 @@ struct SettingsView: View {
                     
                     TextField("Port", text: $port)
                         .keyboardType(.numberPad)
+                    
+                    Toggle(isOn: $useHTTPS) {
+                        Label("Use HTTPS", systemImage: useHTTPS ? "lock.fill" : "lock.open")
+                    }
                 }
                 
                 Section("Authentication") {
@@ -187,6 +192,7 @@ struct SettingsView: View {
     private func loadCurrentValues() {
         host = appState.serverHost
         port = String(appState.serverPort)
+        useHTTPS = appState.useHTTPS
         apiKey = appState.apiKey
     }
     
@@ -200,7 +206,7 @@ struct SettingsView: View {
         isSaving = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            appState.saveConfiguration(host: host, port: portInt, apiKey: apiKey)
+            appState.saveConfiguration(host: host, port: portInt, apiKey: apiKey, useHTTPS: useHTTPS)
             isSaving = false
         }
     }
